@@ -59,8 +59,10 @@ self.addEventListener('activate', (event) => {
 // Fetch event - serve from cache with network fallback
 self.addEventListener('fetch', (event) => {
     if (self.location.hostname === "localhost") {
-        // Bypass cache completely
-        return fetch(event.request);
+        // Bypass the service worker completely: without respondWith() the
+        // browser performs the request itself. Calling fetch() here would
+        // send every request (including form POSTs) a second time.
+        return;
     }
 
     const { request } = event;
