@@ -7,6 +7,7 @@ import Badge from "@components/Badge.astro";
 import Citation from "@components/Citation.astro";
 import { generateJobPostingStructuredData } from "@utils/seo";
 import { formatDate } from "@utils/date";
+import Email from "~/components/Email.astro";
 
 export interface Props {
     frontmatter: Position;
@@ -149,12 +150,15 @@ const backLink =
                             {frontmatter.researcher!.name}
                         </span>
                         {frontmatter.researcher!.email && (
-                            <a
-                                href={`mailto:${frontmatter.researcher!.email}`}
-                                class="text-primary-600 hover:underline ml-1"
-                            >
-                                ({frontmatter.researcher!.email})
-                            </a>
+                            <Email
+                                user={
+                                    frontmatter.researcher!.email.split("@")[0]
+                                }
+                                domain={
+                                    frontmatter.researcher!.email.split("@")[1]
+                                }
+                                lang={lang}
+                            />
                         )}
                         {frontmatter.supervisors &&
                             frontmatter.supervisors.length > 0 && (

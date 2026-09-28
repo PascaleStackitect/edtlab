@@ -12,8 +12,8 @@ const t = useTranslations(lang);
 <button
   data-user={user}
   data-domain={domain}
-  onclick="var d=this.dataset,e=d.user+'@'+d.domain,a=document.createElement('a');a.href='mailto:'+e;a.textContent=e;this.parentNode.replaceWith(a);"
-  class="min-h-0"
+  onclick="var d=this.dataset,e=d.user+'@'+d.domain,a=document.createElement('a');a.href='mailto:'+e;a.textContent=e;a.className='text-primary-600 hover:underline ml-1';this.replaceWith(a);"
+  class="min-h-0 ml-1"
 >
   {t("show-email-label")}
 </button>
