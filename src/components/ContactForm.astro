@@ -512,6 +512,8 @@ const apiUrl = "/api/contact";
                         // Rate limit error from backend
                         const retryAfter = result.retry_after || 60;
                         throw new Error(t("cooldown", { seconds: retryAfter }));
+                    } else if (result.code === "invalid_email") {
+                        throw new Error(t("invalidEmail"));
                     } else {
                         throw new Error(result.error || t("genericError"));
                     }

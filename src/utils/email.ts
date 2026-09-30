@@ -196,8 +196,28 @@ export const sendEmail = async ({ tag, to, replyTo, subject, htmlContent, devPay
     sendSmtpEmail.subject = subject;
     sendSmtpEmail.htmlContent = htmlContent;
 
-    await apiInstance.sendTransacEmail(sendSmtpEmail);
+    try {
+        await apiInstance.sendTransacEmail(sendSmtpEmail);
+    } catch (error) {
+        // The SDK rejects with the raw axios error; Brevo's reason is in the body.
+        const response = (error as { response?: { status?: number; data?: { code?: string; message?: string } } }).response;
+        if (response?.status === 400 && /reply/i.test(response.data?.message ?? '')) {
+            throw new InvalidReplyToError(response.data?.message ?? 'Invalid replyTo');
+        }
+        throw error;
+    }
 };
+
+/**
+ * Brevo refused the submitter's email address (used as replyTo), e.g. a typo
+ * such as "name@inria.f" that passes the loose client-side check.
+ */
+export class InvalidReplyToError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'InvalidReplyToError';
+    }
+}
 
 type Validation<T> = { data: T } | { error: string };
 
@@ -246,6 +266,9 @@ export const createEmailRoute = <T>({ name, validate, send }: EmailRouteOptions<
 
         } catch (error) {
             console.error(`Error processing ${name}:`, error);
+            if (error instanceof InvalidReplyToError) {
+                return jsonResponse({ error: 'Invalid email address', code: 'invalid_email' }, 400);
+            }
             const message = error instanceof Error ? error.message : 'An error occurred while processing your request';
 
             return jsonResponse({ error: message }, 500);
