@@ -602,6 +602,10 @@ const apiUrl = "/api/phd-club";
                     successMessage.scrollIntoView({ behavior: "smooth", block: "center" });
                 } else if (response.status === 429) {
                     throw new Error(t("cooldown", { seconds: result.retry_after || 60 }));
+                } else if (result.code === "invalid_email") {
+                    setError("email", t("invalidEmail"));
+                    form.querySelector("#email").classList.add("border-red-500");
+                    throw new Error(t("invalidEmail"));
                 } else {
                     throw new Error(result.error || t("genericError"));
                 }
